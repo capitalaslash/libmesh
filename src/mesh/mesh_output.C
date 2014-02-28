@@ -70,7 +70,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
   std::vector<Number>      soln;
   std::vector<std::string> names;
 
-  this->_build_variable_names_and_solution_vector(es, soln, names, system_names);
+  this->build_variable_names_and_solution_vector(es, soln, names, system_names);
   //es.build_variable_names  (names);
   //es.build_solution_vector (soln);
 
@@ -83,10 +83,10 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 
 template <class MT>
 void MeshOutput<MT>::
-_build_variable_names_and_solution_vector (const EquationSystems& es,
-                                           std::vector<Number>& soln,
-                                           std::vector<std::string>& names,
-                                           const std::set<std::string>* system_names)
+build_variable_names_and_solution_vector (const EquationSystems& es,
+                                          std::vector<Number>& soln,
+                                          std::vector<std::string>& names,
+                                          const std::set<std::string>* system_names)
 {
   if(!_is_parallel_format)
     {
