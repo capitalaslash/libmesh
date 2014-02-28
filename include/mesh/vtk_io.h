@@ -82,6 +82,8 @@ public:
                                  const std::vector<Number>&,
                                  const std::vector<std::string>&) libmesh_override;
 
+  void populate_vtk_grid (const std::vector<Number>& soln, const std::vector<std::string>& names);
+
   /**
    * This method implements reading a mesh from a specified file
    * in VTK format.
