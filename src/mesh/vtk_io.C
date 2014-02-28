@@ -570,62 +570,9 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
 #else
 
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  this->populate_vtk_grid(soln, names);
 
-  // Is this really important?  If so, it should be more than an assert...
-  // libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
-
-  // we only use Unstructured grids
-  _vtk_grid = vtkUnstructuredGrid::New();
   vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
-
-  // add nodes to the grid and update _local_node_map
-  _local_node_map.clear();
-  this->nodes_to_vtk();
-
-  // add cells to the grid
-  this->cells_to_vtk();
-
-  // add nodal solutions to the grid, if solutions are given
-  if (names.size() > 0)
-    {
-      std::size_t num_vars = names.size();
-      dof_id_type num_nodes = mesh.n_nodes();
-
-      for (std::size_t variable=0; variable<num_vars; ++variable)
-        {
-          vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
-          data->SetName(names[variable].c_str());
-
-          // number of local and ghost nodes
-          data->SetNumberOfValues(_local_node_map.size());
-
-          // loop over all nodes and get the solution for the current
-          // variable, if the node is in the current partition
-          for (dof_id_type k=0; k<num_nodes; ++k)
-            {
-              if (_local_node_map.find(k) == _local_node_map.end())
-                continue; // not a local node
-
-              if (!soln.empty())
-                {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                  libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-                                   << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-                                   << std::endl);
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
-#else
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
-#endif
-                }
-              else
-                {
-                  data->SetValue(_local_node_map[k], 0);
-                }
-            }
-          _vtk_grid->GetPointData()->AddArray(data);
-        }
-    }
 
   // Tell the writer how many partitions exist and on which processor
   // we are currently
